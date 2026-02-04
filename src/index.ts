@@ -1,19 +1,19 @@
 import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
-import { z } from "zod";
 import app from "./app";
+import { registerAutopilotTools } from "./autopilot/registerAutopilotTools";
 
 export class MyMCP extends McpAgent {
 	server = new McpServer({
-		name: "Demo",
-		version: "1.0.0",
+		name: "Time-Line Autopilot MCP",
+		version: "1.3.4",
 	});
 
 	async init() {
-		this.server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-			content: [{ type: "text", text: String(a + b) }],
-		}));
+		// `agents/mcp` attaches Worker bindings on `this.env` at runtime.
+		// We keep this loose-typed to avoid coupling to generated Wrangler types.
+		registerAutopilotTools(this.server, (this as unknown as { env?: unknown }).env as any);
 	}
 }
 

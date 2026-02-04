@@ -1,0 +1,141 @@
+/**
+ * MCP Utility Tools for Node-RED
+ */
+
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { AutopilotMcpConfig } from "../registerAutopilotTools.js";
+
+export default function registerUtilityTools(
+  server: McpServer,
+  config: AutopilotMcpConfig
+) {
+  // Node-RED API Help
+  server.tool(
+    "api-help",
+    "Displays a help table of all available Node-RED Admin API methods, including their implementation status in the MCP server. This tool provides a quick reference for available API endpoints.",
+    {},
+    async () => {
+      // Get the configured API prefix
+      const prefix = config.apiPrefix || "";
+      const endpoints = [
+        { method: "GET", path: "/flows", description: "Get all flows" },
+        { method: "POST", path: "/flows", description: "Update all flows" },
+        {
+          method: "GET",
+          path: "/flow/:id",
+          description: "Get a specific flow",
+        },
+        {
+          method: "PUT",
+          path: "/flow/:id",
+          description: "Update a specific flow",
+        },
+        {
+          method: "DELETE",
+          path: "/flow/:id",
+          description: "Delete a specific flow",
+        },
+        { method: "POST", path: "/flow", description: "Create a new flow" },
+        {
+          method: "GET",
+          path: "/flows/state",
+          description: "Get the state of flows",
+        },
+        {
+          method: "POST",
+          path: "/flows/state",
+          description: "Set the state of flows",
+        },
+        {
+          method: "GET",
+          path: "/nodes",
+          description: "Get list of installed nodes",
+        },
+        {
+          method: "POST",
+          path: "/nodes",
+          description: "Install a new node module",
+        },
+        {
+          method: "GET",
+          path: "/settings",
+          description: "Get runtime settings",
+        },
+        {
+          method: "GET",
+          path: "/diagnostics",
+          description: "Get diagnostics information",
+        },
+        {
+          method: "POST",
+          path: "/inject/:id",
+          description: "Trigger an inject node",
+        },
+        {
+          method: "GET",
+          path: "/nodes/:module",
+          description: "Get a node module’s information",
+        },
+        {
+          method: "PUT",
+          path: "/nodes/:module",
+          description: "Enable/Disable a node module",
+        },
+        {
+          method: "GET",
+          path: "/nodes/:module/:set",
+          description: "Get a node module set information",
+        },
+        {
+          method: "PUT",
+          path: "/nodes/:module/:set",
+          description: "Enable/Disable a node set",
+        },
+      ];
+
+      // Check implemented methods
+      const implementedMethods: Record<string, boolean> = {
+        "GET /flows": true,
+        "POST /flows": true,
+        "GET /flow/:id": true,
+        "PUT /flow/:id": true,
+        "POST /inject/:id": true,
+        "POST /flow": true,
+        "DELETE /flow/:id": true,
+        "GET /flows/state": true,
+        "POST /flows/state": true,
+        "GET /nodes": true,
+        "POST /nodes": true,
+        "GET /nodes/:module": true,
+        "PUT /nodes/:module": true,
+        "GET /nodes/:module/:set": true,
+        "PUT /nodes/:module/:set": true,
+        "GET /settings": true,
+        "GET /diagnostics": true,
+      };
+
+      const output = [
+        "# Node-RED API Help",
+        "",
+        prefix
+          ? `**API Prefix**: ${prefix}`
+          : "**API Prefix**: None (using default Node-RED paths)",
+        "",
+        "| Method | Path | Description | Implemented in MCP |",
+        "|--------|------|-------------|---------------------|",
+      ];
+
+      for (const endpoint of endpoints) {
+        const key = `${endpoint.method} ${endpoint.path}`;
+        const displayPath = prefix ? prefix + endpoint.path : endpoint.path;
+        output.push(
+          `| ${endpoint.method} | ${displayPath} | ${endpoint.description} | ${
+            implementedMethods[key] ? "✅" : "❌"
+          } |`
+        );
+      }
+
+      return { content: [{ type: "text", text: output.join("\n") }] };
+    }
+  );
+}

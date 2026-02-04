@@ -1,0 +1,25 @@
+{
+	"name": "autopilot-mcp-server",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"format": "biome format --write",
+		"lint:fix": "biome lint --fix",
+		"start": "wrangler dev",
+		"cf-typegen": "wrangler types",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "^0.2.2",
+		"agents": "^0.3.6",
+		"hono": "^4.11.7",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"marked": "^17.0.1",
+		"typescript": "5.9.3",
+		"wrangler": "^4.61.0"
+	}
+}
